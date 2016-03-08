@@ -3,6 +3,7 @@ package system;
 public class Main {
 
 	public static void main(String[] args) {
-		System.out.println("test");
+		SerialComm comm = new SerialComm();
+		comm.printAllPort();
 	}
 }
