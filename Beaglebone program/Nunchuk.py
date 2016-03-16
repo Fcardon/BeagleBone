@@ -8,6 +8,7 @@ class Nunchuk(object):
 	def __init__(self):
 		self.bus = SMBus(1)
 		self.bus.write_byte_data(0x52,0x40,0x00)
+		sleep(0.1)
 
 	def read(self):
 		self.bus.write_byte(0x52,0x00)

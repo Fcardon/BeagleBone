@@ -22,6 +22,11 @@ class Servo():
 
 	# Met à jour la position du servo selon la position donné en degrés
 	def setPosition(self, position):
+		if position > 90:
+			position = 90
+		elif position < -90:
+			position = -90
+
 		if self.invert:
 			position*=-1
 
