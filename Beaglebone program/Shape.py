@@ -101,6 +101,4 @@ class Shape():
 		for i in range(0,len(horizontalPositionTable)):
 			self.horizontalServo.setPosition(horizontalPositionTable[i])
 			self.verticalServo.setPosition(verticalPositionTable[i])
-			#print "horizontalServo: "+str(self.horizontalServo.getPosition())
-			#print "verticalServo: "+str(self.verticalServo.getPosition())
 			sleep(0.01)
