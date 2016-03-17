@@ -27,10 +27,10 @@ class Servo():
 		elif position < -90:
 			position = -90
 
+		self.position = position
+
 		if self.invert:
 			position*=-1
-
-		self.position = position
 		duty = (50000/9)*position+1500000
 
 		Methods.writeFile("/sys/devices/ocp.3/pwm_test_"+self.name+"."+self.nb+"/duty", str(duty), "w")

@@ -33,12 +33,12 @@ def initPeriph():
 	# Création des servos
 	global horizontalServo
 	global verticalServo
-	horizontalServo = Servo("P9_14", "10", False)
-	verticalServo = Servo("P9_22", "11", False)
+	horizontalServo = Servo("P9_14", "10", True)
+	verticalServo = Servo("P9_22", "11", True)
 
 	# Création de l'UART
 	global uart
-	uart = serial.Serial(port="/dev/ttyO1", baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+	uart = serial.Serial(port="/dev/ttyO1", baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)#timeout=0.001)
 
 	# Création du Nunchuk
 	global nunchuk
@@ -58,14 +58,22 @@ print "Programme prêt !"
 print ""
 
 #################################################
-mode = "Wii"
+mode = "w"
 
 # Création des formes
-shape = Shape(horizontalServo, verticalServo)
+shape = Shape(horizontalServo, verticalServo, uart)
 
 while 1:
-	if mode == "Auto":
-		print "Mode auto"
+	reading = uart.read()
+	print "Value: "+str(reading)
+	sleep(0.1)
+
+while 1:
+	reading = uart.read()
+	if reading != "8" and reading != "4" and reading != "6" and reading != "2" and reading != "5" and reading != "":
+		mode = reading
+
+	if mode == "a":
 		print "Dessine un carré"
 		shape.startShape("Square", 3)
 		initServos()
@@ -79,10 +87,31 @@ while 1:
 		initServos()
 		sleep(2)
 
-	elif mode == "Manuelle":
-		print "Pas encore implémenté !"
+	elif mode == "m":
+		for i in range(100):
+			reading = uart.read()
+			hPos = horizontalServo.getPosition()
+			vPos = verticalServo.getPosition()
+			if reading != "":
+				if reading == "8":
+					vPos+=2
+				elif reading == "4":
+					hPos-=2
+				elif reading == "6":
+					hPos+=2
+				elif reading == "2":
+					vPos-=2
+				elif reading == "5":
+					hPos = 0
+					vPos = 0
+				
+				horizontalServo.setPosition(hPos)
+				verticalServo.setPosition(vPos)
+				
+			Methods.sendPosition(uart, hPos, vPos)
+			sleep(0.01)
 
-	elif mode == "Wii":
+	elif mode == "w":
 		#print "Mode Wii"
 		buttons = nunchuk.getButtons()
 		button_c = buttons[0]
@@ -104,4 +133,9 @@ while 1:
 
 		horizontalServo.setPosition(hAngle)
 		verticalServo.setPosition(vAngle)
-		print "Positions: ["+str(hAngle)+","+str(vAngle)+"]"
+		Methods.sendPosition(uart, hAngle, vAngle)
+		sleep(0.01)
+	else:
+		print "Mauvais mode !"
+		mode = "a"
+		sleep(2)

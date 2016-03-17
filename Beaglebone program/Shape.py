@@ -3,6 +3,7 @@
 
 import os
 from time import sleep
+import Methods
 
 # Carré
 squareHPositionTable = []
@@ -16,9 +17,10 @@ infiniteVPositionTable = []
 
 class Shape():
 	# Initialisation des différentes formes possible
-	def __init__(self, horizontalServo, verticalServo):
+	def __init__(self, horizontalServo, verticalServo, uart):
 		self.horizontalServo = horizontalServo
 		self.verticalServo = verticalServo
+		self.uart = uart
 
 		self.initSquareShape()
 		self.initCircleShape()
@@ -101,4 +103,5 @@ class Shape():
 		for i in range(0,len(horizontalPositionTable)):
 			self.horizontalServo.setPosition(horizontalPositionTable[i])
 			self.verticalServo.setPosition(verticalPositionTable[i])
+			Methods.sendPosition(self.uart, horizontalPositionTable[i], verticalPositionTable[i])
 			sleep(0.01)
