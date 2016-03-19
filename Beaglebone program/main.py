@@ -60,7 +60,8 @@ print "Programme prêt !"
 print ""
 
 #################################################
-mode = "Wii"
+mode = "Manual"
+print "Mode: Manual"
 
 # Création des formes
 shape = Shape(horizontalServo, verticalServo, laser, uart)
@@ -69,21 +70,32 @@ while 1:
 	reading = uart.read()
 	if reading != "Up" and reading != "Left" and reading != "Right" and reading != "Down" and reading != "Center" and reading != "Laser" and reading != "":
 		mode = reading
+		print "Mode: "+mode
 
 	if mode == "Auto":
-		laser.ON()
-		print "Dessine un carré"
-		shape.startShape("Square", 3)
-		initServos()
-		sleep(2)
-		print "Dessine un cercle"
-		shape.startShape("Circle", 3)
-		initServos()
-		sleep(2)
-		print "Dessine un infini"
-		shape.startShape("Infinite", 3)
-		initServos()
-		sleep(2)
+		while 1:
+			laser.ON()
+			print "Dessine un carré"
+			shape.startShape("Square", 2)
+			initServos()
+
+			reading = uart.read()
+			if reading != "Auto" and reading != "":
+				break
+			sleep(2)
+			print "Dessine un cercle"
+			shape.startShape("Circle", 3)
+			initServos()
+
+			reading = uart.read()
+			if reading != "Auto" and reading != "":
+				break
+			sleep(2)
+			print "Dessine un infini"
+			shape.startShape("Infinite", 3)
+			initServos()
+			sleep(2)
+			break
 
 	elif mode == "Semi-auto":
 		laser.OFF()
@@ -95,10 +107,11 @@ while 1:
 			pointDatas = uart.read()
 			if pointDatas == "Finish":
 				break
-			pointDatasTable = pointDatas.split(",")
-			horizontalPositionTable.append(int(pointDatasTable[0])*2)
-			verticalPositionTable.append(int(pointDatasTable[1])*2)
-			laserStateTable.append(pointDatasTable[2])
+			if pointDatas != "Semi-auto":
+				pointDatasTable = pointDatas.split(",")
+				horizontalPositionTable.append(int(pointDatasTable[0])*2)
+				verticalPositionTable.append(int(pointDatasTable[1])*2)
+				laserStateTable.append(pointDatasTable[2])
 
 		shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
 		laser.OFF()

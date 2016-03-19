@@ -98,6 +98,9 @@ class Shape():
 				self.start(infiniteHPositionTable, infiniteVPositionTable, ["1"]*len(infiniteHPositionTable))
 		else:
 			return
+
+		self.laser.OFF()
+
 	def start(self, horizontalPositionTable, verticalPositionTable, laserStateTable):
 		if len(horizontalPositionTable) != len(verticalPositionTable):
 			print "Erreur (Shape): Les tableau des 2 servos ne sont pas de même longueur !!!"
