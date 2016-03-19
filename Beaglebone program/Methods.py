@@ -3,5 +3,5 @@ def writeFile(path, value, writeType):
 	wFile.write(value)
 	wFile.close()
 
-def sendPosition(uart, posH, posV):
-	uart.write(str(posH)+","+str(posV)+"\r\n")
+def sendData(uart, posH, posV, laser):
+	uart.write(str(posH)+","+str(posV)+","+str(laser)+"\r\n")

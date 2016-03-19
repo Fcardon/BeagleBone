@@ -17,9 +17,10 @@ infiniteVPositionTable = []
 
 class Shape():
 	# Initialisation des différentes formes possible
-	def __init__(self, horizontalServo, verticalServo, uart):
+	def __init__(self, horizontalServo, verticalServo, laser, uart):
 		self.horizontalServo = horizontalServo
 		self.verticalServo = verticalServo
+		self.laser = laser
 		self.uart = uart
 
 		self.initSquareShape()
@@ -103,5 +104,5 @@ class Shape():
 		for i in range(0,len(horizontalPositionTable)):
 			self.horizontalServo.setPosition(horizontalPositionTable[i])
 			self.verticalServo.setPosition(verticalPositionTable[i])
-			Methods.sendPosition(self.uart, horizontalPositionTable[i], verticalPositionTable[i])
+			Methods.sendData(self.uart, horizontalPositionTable[i], verticalPositionTable[i], self.laser.getState())
 			sleep(0.01)

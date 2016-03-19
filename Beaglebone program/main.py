@@ -38,7 +38,7 @@ def initPeriph():
 
 	# Création de l'UART
 	global uart
-	uart = serial.Serial(port="/dev/ttyO1", baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)#timeout=0.001)
+	uart = serial.Serial(port="/dev/ttyO1", baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.001)
 
 	# Création du Nunchuk
 	global nunchuk
@@ -47,6 +47,7 @@ def initPeriph():
 def initServos():
 	horizontalServo.setPosition(0)
 	verticalServo.setPosition(0)
+	Methods.sendData(uart, 0, 0, laser.getState())
 
 print "Initialisation des péripheriques..."
 initPeriph()
@@ -61,19 +62,15 @@ print ""
 mode = "w"
 
 # Création des formes
-shape = Shape(horizontalServo, verticalServo, uart)
+shape = Shape(horizontalServo, verticalServo, laser, uart)
 
 while 1:
 	reading = uart.read()
-	print "Value: "+str(reading)
-	sleep(0.1)
-
-while 1:
-	reading = uart.read()
-	if reading != "8" and reading != "4" and reading != "6" and reading != "2" and reading != "5" and reading != "":
+	if reading != "8" and reading != "4" and reading != "6" and reading != "2" and reading != "5" and reading != "l" and reading != "":
 		mode = reading
 
 	if mode == "a":
+		laser.ON()
 		print "Dessine un carré"
 		shape.startShape("Square", 3)
 		initServos()
@@ -104,11 +101,18 @@ while 1:
 				elif reading == "5":
 					hPos = 0
 					vPos = 0
+				elif reading == "l":
+					if laser.getState() == "0":
+						laser.ON()
+					else:
+						laser.OFF()
+				else:
+					break
 				
 				horizontalServo.setPosition(hPos)
 				verticalServo.setPosition(vPos)
 				
-			Methods.sendPosition(uart, hPos, vPos)
+			Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
 			sleep(0.01)
 
 	elif mode == "w":
@@ -133,7 +137,7 @@ while 1:
 
 		horizontalServo.setPosition(hAngle)
 		verticalServo.setPosition(vAngle)
-		Methods.sendPosition(uart, hAngle, vAngle)
+		Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
 		sleep(0.01)
 	else:
 		print "Mauvais mode !"
