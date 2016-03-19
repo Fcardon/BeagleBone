@@ -84,7 +84,10 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		mntmHelp.addActionListener(this);
 		
 		// Buttons
-		tglbtnAuto.setSelected(true);
+		tglbtnManuel.setSelected(true);
+		tglbtnAuto.setEnabled(false);
+		tglbtnManuel.setEnabled(false);
+		tglbtnWii.setEnabled(false);
 		btnStart.setEnabled(false);
 		btnReset.setEnabled(false);
 		
@@ -133,6 +136,8 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		
 		////////////
 		tglbtnManuel.addKeyListener(this);
+		btnStart.addKeyListener(this);
+		btnReset.addKeyListener(this);
 		
 		timer.start();
 	}
@@ -140,13 +145,21 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	public void setUART(SerialComm uart) {
 		this.uart = uart;
 		lblUART.setText("UART: "+uart.getUARTName());
+		
+		tglbtnAuto.setEnabled(true);
+		tglbtnManuel.setEnabled(true);
+		tglbtnWii.setEnabled(true);
+		
+		tglbtnManuel.requestFocus();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		btnStart.setEnabled(tglbtnManuel.isSelected());
-		btnReset.setEnabled(tglbtnManuel.isSelected());
-		graph.setManualMode(tglbtnManuel.isSelected());
+		if (uart != null) {
+			btnStart.setEnabled(tglbtnManuel.isSelected());
+			btnReset.setEnabled(tglbtnManuel.isSelected());
+			graph.setManualMode(tglbtnManuel.isSelected());
+		}
 		// Timer
 		if (e.getSource().equals(timer)) {
 			if (uart != null) {
@@ -190,6 +203,7 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnWii.setSelected(false);
 			
 			if (uart != null) {
+				uart.write("Manual");
 				uart.write("Manual");
 			}
 		}
