@@ -132,8 +132,8 @@ while 1:
 			vAngle = int(axis[1]*-1.8+225.0)# Min=175 ; Max=75
 		else:
 			position = nunchuk.getJoystickPosition()
-			hAngle = int(position[0]*0.92-122.31)# Min=35 ; Max=230
-			vAngle = int(position[1]*0.96-120.64)# Min=32 ; Max=220
+			hAngle = int(position[0]*0.93-123.58)# Min=36 ; Max=229
+			vAngle = int(position[1]*0.95-120.48)# Min=32 ; Max=221
 
 		horizontalServo.setPosition(hAngle)
 		verticalServo.setPosition(vAngle)

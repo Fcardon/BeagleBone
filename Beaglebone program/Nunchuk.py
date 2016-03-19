@@ -21,8 +21,17 @@ class Nunchuk(object):
 		return data[0],data[1]
 
 	def getAccelerometerAxis(self):
-		data = self.read()
-		return data[2],data[3],data[4]
+		x = 0
+		y = 0
+		z = 0
+		stability = 5
+
+		for i in range(stability):
+			data = self.read()
+			x+=data[2]
+			y+=data[3]
+			z+=data[4]
+		return x/stability,y/stability,z/stability
 
 	def getButtons(self):
 		data = self.read()
