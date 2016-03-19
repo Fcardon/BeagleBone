@@ -11,10 +11,13 @@ from Servo import Servo
 from Shape import Shape
 from Nunchuk import Nunchuk
 from UART import UART
+from Mode import Mode
 
 def initPeriph():
 	try:
 		# GPIOs
+		Methods.writeFile("/sys/class/gpio/export", "66", "a")
+		Methods.writeFile("/sys/class/gpio/export", "69", "a")
 		Methods.writeFile("/sys/class/gpio/export", "45", "a")
 
 		# PWMs
@@ -24,12 +27,17 @@ def initPeriph():
 		Methods.writeFile("/sys/devices/bone_capemgr.8/slots", "BB-UART1", "a")
 
 		sleep(2)
+
 	except IOError:
 		print "La configuration des périphériques à déjà été faites"
 
 	# Création du laser
 	global laser
 	laser = Laser(45)
+
+	# Création de la gestion d'indication des modes
+	global modeObj
+	modeObj = Mode(66, 69)
 
 	# Création des servos
 	global horizontalServo
@@ -61,7 +69,7 @@ print ""
 
 #################################################
 mode = "Manual"
-print "Mode: Manual"
+modeObj.setMode(mode)
 
 # Création des formes
 shape = Shape(horizontalServo, verticalServo, laser, uart)
@@ -70,7 +78,7 @@ while 1:
 	reading = uart.read()
 	if reading != "Up" and reading != "Left" and reading != "Right" and reading != "Down" and reading != "Center" and reading != "Laser" and reading != "":
 		mode = reading
-		print "Mode: "+mode
+		modeObj.setMode(mode)
 
 	if mode == "Auto":
 		while 1:
@@ -80,15 +88,16 @@ while 1:
 			initServos()
 
 			reading = uart.read()
-			if reading != "Auto" and reading != "":
+			if reading == "Auto":
+				reading = uart.read()
+			if uart.inWaiting() != 0:
 				break
 			sleep(2)
 			print "Dessine un cercle"
 			shape.startShape("Circle", 3)
 			initServos()
 
-			reading = uart.read()
-			if reading != "Auto" and reading != "":
+			if uart.inWaiting() != 0:
 				break
 			sleep(2)
 			print "Dessine un infini"
@@ -116,6 +125,7 @@ while 1:
 		shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
 		laser.OFF()
 		mode = "Manual"
+		modeObj.setMode(mode)
 
 	elif mode == "Manual":
 		for i in range(100):
@@ -149,7 +159,6 @@ while 1:
 			sleep(0.01)
 
 	elif mode == "Wii":
-		#print "Mode Wii"
 		buttons = nunchuk.getButtons()
 		button_c = buttons[0]
 		button_z = buttons[1]
@@ -173,6 +182,6 @@ while 1:
 		Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
 		sleep(0.01)
 	else:
-		print "Mauvais mode !"
-		mode = "Auto"
 		sleep(2)
+		mode = "Auto"
+		modeObj.setMode(mode)

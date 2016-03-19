@@ -17,3 +17,6 @@ class UART(object):
 
 	def write(self, datas):
 		self.uart.write(datas)
+
+	def inWaiting(self):
+		return self.uart.inWaiting()
