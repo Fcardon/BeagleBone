@@ -161,8 +161,8 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnWii.setSelected(false);
 			
 			if (uart != null) {
-				uart.write("a");
-				uart.write("a");
+				uart.write("Auto");
+				uart.write("Auto");
 			}
 		}
 		else if (e.getSource().equals(tglbtnManuel)) {
@@ -170,7 +170,7 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnManuel.setSelected(true);
 			tglbtnWii.setSelected(false);
 			if (uart != null) {
-				uart.write("m");
+				uart.write("Manual");
 			}
 		}
 		else if (e.getSource().equals(tglbtnWii)) {
@@ -178,8 +178,8 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnManuel.setSelected(false);
 			tglbtnWii.setSelected(true);
 			if (uart != null) {
-				uart.write("w");
-				uart.write("w");
+				uart.write("Wii");
+				uart.write("Wii");
 			}
 		}
 		// Menu
@@ -200,22 +200,22 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == 104) {
-			uart.write("8");
+			uart.write("Up");
 		}
 		else if (e.getKeyCode() == 100) {
-			uart.write("4");
+			uart.write("Left");
 		}
 		else if (e.getKeyCode() == 102) {
-			uart.write("6");
+			uart.write("Right");
 		}
 		else if (e.getKeyCode() == 98) {
-			uart.write("2");
+			uart.write("Down");
 		}
 		else if (e.getKeyCode() == 101) {
-			uart.write("5");
+			uart.write("Center");
 		}
 		else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			uart.write("l");
+			uart.write("Laser");
 		}
 	}
 	@Override

@@ -4,4 +4,4 @@ def writeFile(path, value, writeType):
 	wFile.close()
 
 def sendData(uart, posH, posV, laser):
-	uart.write(str(posH)+","+str(posV)+","+str(laser)+"\r\n")
+	uart.write(str(posH)+","+str(posV)+","+str(laser)+"\r")

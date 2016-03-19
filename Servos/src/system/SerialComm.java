@@ -20,11 +20,11 @@ public class SerialComm {
 
 	private String UARTName = "Inconnu";
 	private String datas;
-	
+
 	public SerialComm(String portName, int baudrate, int nbData, int nbStop, int parity) {
 		UARTName = portName;
 		portList = CommPortIdentifier.getPortIdentifiers();
-		
+
 		while (portList.hasMoreElements()) {
 			portId = (CommPortIdentifier) portList.nextElement();
 			if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
@@ -34,7 +34,7 @@ public class SerialComm {
 					} catch (PortInUseException e) {
 						e.printStackTrace();
 					}
-					
+
 					try {
 						serialPort.setSerialPortParams(baudrate, nbData, nbStop, parity);
 					} catch (UnsupportedCommOperationException e) {
@@ -44,9 +44,10 @@ public class SerialComm {
 			}
 		}
 	}
-	
+
 	public void write(String data) {
 		System.out.println("Writing data: "+data);
+		data+="\r";
 		try {
 			outputStream = serialPort.getOutputStream();
 			outputStream.write(data.getBytes());
@@ -55,22 +56,26 @@ public class SerialComm {
 			e.printStackTrace();
 		}
 	}
+
 	public String read() {
-		datas = "";
 		char data;
+		datas = "";
+
 		try {
 			inputStream = serialPort.getInputStream();
-			do {
+
+			while (true) {
 				data = (char) inputStream.read();
+				if (data == 13 || data == 0) {
+					System.out.println("Datas: "+datas);
+					return datas;
+				}
 				datas+=data;
-			} while (data != 10);
-			inputStream.skip(inputStream.available());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		datas = datas.substring(0, datas.length()-2);
-		System.out.println("Datas: "+datas);
-		return datas;
+		return null;
 	}
 
 	public String getUARTName() {

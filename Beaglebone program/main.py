@@ -10,6 +10,7 @@ from Laser import Laser
 from Servo import Servo
 from Shape import Shape
 from Nunchuk import Nunchuk
+from UART import UART
 
 def initPeriph():
 	try:
@@ -38,7 +39,7 @@ def initPeriph():
 
 	# Création de l'UART
 	global uart
-	uart = serial.Serial(port="/dev/ttyO1", baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.001)
+	uart = UART()
 
 	# Création du Nunchuk
 	global nunchuk
@@ -59,17 +60,17 @@ print "Programme prêt !"
 print ""
 
 #################################################
-mode = "w"
+mode = "Wii"
 
 # Création des formes
 shape = Shape(horizontalServo, verticalServo, laser, uart)
 
 while 1:
 	reading = uart.read()
-	if reading != "8" and reading != "4" and reading != "6" and reading != "2" and reading != "5" and reading != "l" and reading != "":
+	if reading != "Up" and reading != "Left" and reading != "Right" and reading != "Down" and reading != "Center" and reading != "Laser" and reading != "":
 		mode = reading
 
-	if mode == "a":
+	if mode == "Auto":
 		laser.ON()
 		print "Dessine un carré"
 		shape.startShape("Square", 3)
@@ -84,24 +85,24 @@ while 1:
 		initServos()
 		sleep(2)
 
-	elif mode == "m":
+	elif mode == "Manual":
 		for i in range(100):
 			reading = uart.read()
 			hPos = horizontalServo.getPosition()
 			vPos = verticalServo.getPosition()
 			if reading != "":
-				if reading == "8":
+				if reading == "Up":
 					vPos+=2
-				elif reading == "4":
+				elif reading == "Left":
 					hPos-=2
-				elif reading == "6":
+				elif reading == "Right":
 					hPos+=2
-				elif reading == "2":
+				elif reading == "Down":
 					vPos-=2
-				elif reading == "5":
+				elif reading == "Center":
 					hPos = 0
 					vPos = 0
-				elif reading == "l":
+				elif reading == "Laser":
 					if laser.getState() == "0":
 						laser.ON()
 					else:
@@ -115,7 +116,7 @@ while 1:
 			Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
 			sleep(0.01)
 
-	elif mode == "w":
+	elif mode == "Wii":
 		#print "Mode Wii"
 		buttons = nunchuk.getButtons()
 		button_c = buttons[0]
@@ -141,5 +142,5 @@ while 1:
 		sleep(0.01)
 	else:
 		print "Mauvais mode !"
-		mode = "a"
+		mode = "Auto"
 		sleep(2)
