@@ -13,11 +13,13 @@ class Laser():
 		Methods.writeFile("/sys/class/gpio/gpio"+str(self.nb)+"/direction", "high", "w")
 		self.OFF()
 
+	def setState(self, state):
+		self.state = state
+		Methods.writeFile("/sys/class/gpio/gpio"+str(self.nb)+"/value", self.state, "w")
+
 	def OFF(self):
-		self.state = "0"
-		Methods.writeFile("/sys/class/gpio/gpio"+str(self.nb)+"/value", self.state, "w")
+		self.setState("0")
 	def ON(self):
-		self.state = "1"
-		Methods.writeFile("/sys/class/gpio/gpio"+str(self.nb)+"/value", self.state, "w")
+		self.setState("1")
 	def getState(self):
 		return self.state

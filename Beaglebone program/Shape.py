@@ -85,18 +85,20 @@ class Shape():
 
 	# Démarre le dessin de la forme choisi
 	def startShape(self, shape, nb):
+		laserStateTable = ["1"]*len(squareHPositionTable)
+
 		if shape == "Square":
 			for i in range(0, nb):
-				self.start(squareHPositionTable, squareVPositionTable)
+				self.start(squareHPositionTable, squareVPositionTable, laserStateTable)
 		elif shape == "Circle":
 			for i in range(0, nb):
-				self.start(circleHPositionTable, circleVPositionTable)
+				self.start(circleHPositionTable, circleVPositionTable, ["1"]*len(circleHPositionTable))
 		elif shape == "Infinite":
 			for i in range(0, nb):
-				self.start(infiniteHPositionTable, infiniteVPositionTable)
+				self.start(infiniteHPositionTable, infiniteVPositionTable, ["1"]*len(infiniteHPositionTable))
 		else:
 			return
-	def start(self, horizontalPositionTable, verticalPositionTable):
+	def start(self, horizontalPositionTable, verticalPositionTable, laserStateTable):
 		if len(horizontalPositionTable) != len(verticalPositionTable):
 			print "Erreur (Shape): Les tableau des 2 servos ne sont pas de même longueur !!!"
 			return
@@ -104,5 +106,6 @@ class Shape():
 		for i in range(0,len(horizontalPositionTable)):
 			self.horizontalServo.setPosition(horizontalPositionTable[i])
 			self.verticalServo.setPosition(verticalPositionTable[i])
+			self.laser.setState(laserStateTable[i])
 			Methods.sendData(self.uart, horizontalPositionTable[i], verticalPositionTable[i], self.laser.getState())
 			sleep(0.01)

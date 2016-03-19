@@ -85,6 +85,25 @@ while 1:
 		initServos()
 		sleep(2)
 
+	elif mode == "Semi-auto":
+		laser.OFF()
+		horizontalPositionTable = []
+		verticalPositionTable = []
+		laserStateTable = []
+
+		while 1:
+			pointDatas = uart.read()
+			if pointDatas == "Finish":
+				break
+			pointDatasTable = pointDatas.split(",")
+			horizontalPositionTable.append(int(pointDatasTable[0])*2)
+			verticalPositionTable.append(int(pointDatasTable[1])*2)
+			laserStateTable.append(pointDatasTable[2])
+
+		shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
+		laser.OFF()
+		mode = "Manual"
+
 	elif mode == "Manual":
 		for i in range(100):
 			reading = uart.read()

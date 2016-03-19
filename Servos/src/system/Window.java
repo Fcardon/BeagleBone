@@ -6,7 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -19,6 +21,7 @@ import javax.swing.Timer;
 public class Window extends JFrame implements ActionListener, KeyListener {
 	
 	private Timer timer = new Timer(1, this);
+	private ArrayList<int[]> savedPoints = new ArrayList<int[]>();
 	
 	// Objects
 	@SuppressWarnings("unused")
@@ -38,6 +41,8 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	private JToggleButton tglbtnAuto = new JToggleButton("Auto");
 	private JToggleButton tglbtnManuel = new JToggleButton("Manuel");
 	private JToggleButton tglbtnWii = new JToggleButton("Wii");
+	private JButton btnStart = new JButton("Start");
+	private JButton btnReset = new JButton("Reset");
 	
 	// Panel
 	private Graph graph = new Graph();
@@ -80,20 +85,29 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		
 		// Buttons
 		tglbtnAuto.setSelected(true);
+		btnStart.setEnabled(false);
+		btnReset.setEnabled(false);
 		
 		tglbtnAuto.setBounds(25, 60, 200, 40);
 		tglbtnManuel.setBounds(25, 110, 200, 40);
 		tglbtnWii.setBounds(25, 160, 200, 40);
+		btnStart.setBounds(47, 500, 80, 40);
+		btnReset.setBounds(132, 500, 80, 40);
 		
 		getContentPane().add(tglbtnAuto);
 		getContentPane().add(tglbtnManuel);
 		getContentPane().add(tglbtnWii);
+		getContentPane().add(btnStart);
+		getContentPane().add(btnReset);
 		
 		tglbtnAuto.addActionListener(this);
 		tglbtnManuel.addActionListener(this);
 		tglbtnWii.addActionListener(this);
+		btnStart.addActionListener(this);
+		btnReset.addActionListener(this);
 		
 		// Panel
+		savedPoints = graph.getSavedPoints();
 		graph.setBackground(Color.WHITE);
 		graph.setBounds(260, 20, 520, 520);
 		getContentPane().add(graph);
@@ -130,6 +144,9 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		btnStart.setEnabled(tglbtnManuel.isSelected());
+		btnReset.setEnabled(tglbtnManuel.isSelected());
+		graph.setManualMode(tglbtnManuel.isSelected());
 		// Timer
 		if (e.getSource().equals(timer)) {
 			if (uart != null) {
@@ -159,6 +176,8 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnAuto.setSelected(true);
 			tglbtnManuel.setSelected(false);
 			tglbtnWii.setSelected(false);
+			savedPoints.clear();
+			graph.repaint();
 			
 			if (uart != null) {
 				uart.write("Auto");
@@ -169,6 +188,7 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnAuto.setSelected(false);
 			tglbtnManuel.setSelected(true);
 			tglbtnWii.setSelected(false);
+			
 			if (uart != null) {
 				uart.write("Manual");
 			}
@@ -177,10 +197,27 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			tglbtnAuto.setSelected(false);
 			tglbtnManuel.setSelected(false);
 			tglbtnWii.setSelected(true);
+			savedPoints.clear();
+			graph.repaint();
+			
 			if (uart != null) {
 				uart.write("Wii");
 				uart.write("Wii");
 			}
+		}
+		else if (e.getSource().equals(btnStart)) {
+			if (uart != null) {
+				uart.write("Semi-auto");
+				uart.write("Semi-auto");
+				for (int i=0; i<savedPoints.size(); i++) {
+					uart.write(savedPoints.get(i)[0]+","+savedPoints.get(i)[1]+","+savedPoints.get(i)[2]);
+				}
+				uart.write("Finish");
+			}
+		}
+		else if (e.getSource().equals(btnReset)) {
+			savedPoints.clear();
+			graph.repaint();
 		}
 		// Menu
 		else if (e.getSource().equals(mntmConnection)) {
