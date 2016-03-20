@@ -29,7 +29,7 @@ def initPeriph():
 		sleep(2)
 
 	except IOError:
-		print "La configuration des périphériques à déjà été faites"
+		print "La configuration des périphériques a déjà été faites"
 
 	# Création du laser
 	global laser
@@ -74,114 +74,122 @@ modeObj.setMode(mode)
 # Création des formes
 shape = Shape(horizontalServo, verticalServo, laser, uart)
 
-while 1:
-	reading = uart.read()
-	if reading != "Up" and reading != "Left" and reading != "Right" and reading != "Down" and reading != "Center" and reading != "Laser" and reading != "":
-		mode = reading
-		modeObj.setMode(mode)
+try:
+	while 1:
+		reading = uart.read()
+		if reading != "Up" and reading != "Left" and reading != "Right" and reading != "Down" and reading != "Center" and reading != "Laser" and reading != "":
+			mode = reading
+			modeObj.setMode(mode)
 
-	if mode == "Auto":
-		while 1:
-			laser.ON()
-			print "Dessine un carré"
-			shape.startShape("Square", 2)
-			initServos()
+		if mode == "Auto":
+			while 1:
+				laser.ON()
+				print "Dessine un carré"
+				shape.startShape("Square", 2)
+				initServos()
 
-			reading = uart.read()
-			if reading == "Auto":
 				reading = uart.read()
-			if uart.inWaiting() != 0:
-				break
-			sleep(2)
-			print "Dessine un cercle"
-			shape.startShape("Circle", 3)
-			initServos()
-
-			if uart.inWaiting() != 0:
-				break
-			sleep(2)
-			print "Dessine un infini"
-			shape.startShape("Infinite", 3)
-			initServos()
-			sleep(2)
-			break
-
-	elif mode == "Semi-auto":
-		laser.OFF()
-		horizontalPositionTable = []
-		verticalPositionTable = []
-		laserStateTable = []
-
-		while 1:
-			pointDatas = uart.read()
-			if pointDatas == "Finish":
-				break
-			if pointDatas != "Semi-auto":
-				pointDatasTable = pointDatas.split(",")
-				horizontalPositionTable.append(int(pointDatasTable[0])*2)
-				verticalPositionTable.append(int(pointDatasTable[1])*2)
-				laserStateTable.append(pointDatasTable[2])
-
-		shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
-		laser.OFF()
-		mode = "Manual"
-		modeObj.setMode(mode)
-
-	elif mode == "Manual":
-		for i in range(100):
-			reading = uart.read()
-			hPos = horizontalServo.getPosition()
-			vPos = verticalServo.getPosition()
-			if reading != "":
-				if reading == "Up":
-					vPos+=2
-				elif reading == "Left":
-					hPos-=2
-				elif reading == "Right":
-					hPos+=2
-				elif reading == "Down":
-					vPos-=2
-				elif reading == "Center":
-					hPos = 0
-					vPos = 0
-				elif reading == "Laser":
-					if laser.getState() == "0":
-						laser.ON()
-					else:
-						laser.OFF()
-				else:
+				if reading == "Auto":
+					reading = uart.read()
+				if uart.inWaiting() != 0:
 					break
-				
-				horizontalServo.setPosition(hPos)
-				verticalServo.setPosition(vPos)
-				
+				sleep(2)
+				print "Dessine un cercle"
+				shape.startShape("Circle", 3)
+				initServos()
+
+				if uart.inWaiting() != 0:
+					break
+				sleep(2)
+				print "Dessine un infini"
+				shape.startShape("Infinite", 3)
+				initServos()
+				sleep(2)
+				break
+
+		elif mode == "Semi-auto":
+			laser.OFF()
+			horizontalPositionTable = []
+			verticalPositionTable = []
+			laserStateTable = []
+
+			while 1:
+				pointDatas = uart.read()
+				if pointDatas == "Finish":
+					break
+				if pointDatas != "Semi-auto":
+					pointDatasTable = pointDatas.split(",")
+					horizontalPositionTable.append(int(pointDatasTable[0])*2)
+					verticalPositionTable.append(int(pointDatasTable[1])*2)
+					laserStateTable.append(pointDatasTable[2])
+
+			shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
+			laser.OFF()
+			mode = "Manual"
+			modeObj.setMode(mode)
+
+		elif mode == "Manual":
+			for i in range(100):
+				reading = uart.read()
+				hPos = horizontalServo.getPosition()
+				vPos = verticalServo.getPosition()
+				if reading != "":
+					if reading == "Up":
+						vPos+=2
+					elif reading == "Left":
+						hPos-=2
+					elif reading == "Right":
+						hPos+=2
+					elif reading == "Down":
+						vPos-=2
+					elif reading == "Center":
+						hPos = 0
+						vPos = 0
+					elif reading == "Laser":
+						if laser.getState() == "0":
+							laser.ON()
+						else:
+							laser.OFF()
+					else:
+						break
+					
+					horizontalServo.setPosition(hPos)
+					verticalServo.setPosition(vPos)
+					
+				Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
+				sleep(0.01)
+
+		elif mode == "Wii":
+			buttons = nunchuk.getButtons()
+			button_c = buttons[0]
+			button_z = buttons[1]
+
+			if button_z:
+				laser.ON()
+			else:
+				laser.OFF()
+
+			if button_c:
+				axis = nunchuk.getAccelerometerAxis()
+				hAngle = int(axis[0]*1.8-216.0)# Min=70 ; Max=170
+				vAngle = int(axis[1]*-1.8+225.0)# Min=175 ; Max=75
+			else:
+				position = nunchuk.getJoystickPosition()
+				hAngle = int(position[0]*0.93-123.58)# Min=36 ; Max=229
+				vAngle = int(position[1]*0.95-120.48)# Min=32 ; Max=221
+
+			horizontalServo.setPosition(hAngle)
+			verticalServo.setPosition(vAngle)
 			Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
 			sleep(0.01)
-
-	elif mode == "Wii":
-		buttons = nunchuk.getButtons()
-		button_c = buttons[0]
-		button_z = buttons[1]
-
-		if button_z:
-			laser.ON()
 		else:
-			laser.OFF()
-
-		if button_c:
-			axis = nunchuk.getAccelerometerAxis()
-			hAngle = int(axis[0]*1.8-216.0)# Min=70 ; Max=170
-			vAngle = int(axis[1]*-1.8+225.0)# Min=175 ; Max=75
-		else:
-			position = nunchuk.getJoystickPosition()
-			hAngle = int(position[0]*0.93-123.58)# Min=36 ; Max=229
-			vAngle = int(position[1]*0.95-120.48)# Min=32 ; Max=221
-
-		horizontalServo.setPosition(hAngle)
-		verticalServo.setPosition(vAngle)
-		Methods.sendData(uart, horizontalServo.getPosition(), verticalServo.getPosition(), laser.getState())
-		sleep(0.01)
-	else:
-		sleep(2)
-		mode = "Auto"
-		modeObj.setMode(mode)
+			sleep(2)
+			mode = "Auto"
+			modeObj.setMode(mode)
+except KeyboardInterrupt:
+	print "Arret du programme..."
+	modeObj.stopThread()
+	modeObj.setMode("Stop")
+	laser.OFF()
+	initServos()
+	print "Programme arreté"

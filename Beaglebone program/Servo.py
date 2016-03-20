@@ -18,7 +18,7 @@ class Servo():
 			Methods.writeFile("/sys/devices/ocp.3/pwm_test_"+name+"."+nb+"/period", "20000000", "w")
 			self.setPosition(0)
 		except IOError:
-			print "La configuration des servos à déjà été faites"
+			print "La configuration des servos a déjà été faites"
 
 	# Met à jour la position du servo selon la position donné en degrés
 	def setPosition(self, position):
