@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -47,12 +48,16 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	// Panel
 	private Graph graph = new Graph();
 	
+	// Combobox
+	private JComboBox<String> comboBox = new JComboBox<String>();
+	
 	// Labels
 	private JLabel lblMode = new JLabel("Mode de fonctionnement");
 	private JLabel lblInfo = new JLabel("Informations");
 	private JLabel lblUART = new JLabel("UART: Inconnu");
 	private JLabel lblLaser = new JLabel("Laser: Inconnu");
 	private JLabel lblPosition = new JLabel("Position: 0,0");
+	private JLabel lblShape = new JLabel("Forme: ");
 	
 	// Fonts
 	private Font titleFont = new Font("Trebuchet MS", Font.BOLD, 18);
@@ -121,23 +126,38 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		lblUART.setBounds(30, 280, 300, 15);
 		lblLaser.setBounds(30, 310, 300, 15);
 		lblPosition.setBounds(30, 340, 300, 15);
+		lblShape.setBounds(40, 460, 300, 15);
 
 		lblMode.setFont(titleFont);
 		lblInfo.setFont(titleFont);
 		lblUART.setFont(globalFont);
 		lblLaser.setFont(globalFont);
 		lblPosition.setFont(globalFont);
+		lblShape.setFont(globalFont);
 		
 		getContentPane().add(lblMode);
 		getContentPane().add(lblInfo);
 		getContentPane().add(lblUART);
 		getContentPane().add(lblLaser);
 		getContentPane().add(lblPosition);
+		getContentPane().add(lblShape);
+		
+		// Combobox
+		comboBox.setBounds(132, 450, 100, 40);
+		comboBox.addItem("Square");
+		comboBox.addItem("Diamond");
+		comboBox.addItem("Circle");
+		comboBox.addItem("Infinite");
+		comboBox.addItem("Perso");
+		comboBox.setEnabled(false);
+		getContentPane().add(comboBox);
+		comboBox.addActionListener(this);
 		
 		////////////
 		tglbtnManuel.addKeyListener(this);
 		btnStart.addKeyListener(this);
 		btnReset.addKeyListener(this);
+		comboBox.addKeyListener(this);
 		
 		timer.start();
 	}
@@ -157,8 +177,9 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	public void actionPerformed(ActionEvent e) {
 		if (uart != null) {
 			btnStart.setEnabled(tglbtnManuel.isSelected());
-			btnReset.setEnabled(tglbtnManuel.isSelected());
-			graph.setManualMode(tglbtnManuel.isSelected());
+			btnReset.setEnabled(tglbtnManuel.isSelected() && comboBox.getSelectedItem().equals("Perso"));
+			graph.setManualMode(tglbtnManuel.isSelected() && comboBox.getSelectedItem().equals("Perso"));
+			comboBox.setEnabled(tglbtnManuel.isSelected());
 		}
 		// Timer
 		if (e.getSource().equals(timer)) {
@@ -186,45 +207,66 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		}
 		// Buttons
 		else if (e.getSource().equals(tglbtnAuto)) {
-			tglbtnAuto.setSelected(true);
-			tglbtnManuel.setSelected(false);
-			tglbtnWii.setSelected(false);
-			savedPoints.clear();
-			graph.repaint();
-			
-			if (uart != null) {
-				uart.write("Auto");
-				uart.write("Auto");
+			if (tglbtnManuel.isSelected() || tglbtnWii.isSelected()) {
+				tglbtnAuto.setSelected(true);
+				tglbtnManuel.setSelected(false);
+				tglbtnWii.setSelected(false);
+				savedPoints.clear();
+				graph.repaint();
+				
+				if (uart != null) {
+					uart.write("Auto");
+					uart.write("Auto");
+				}
+			}
+			else {
+				tglbtnAuto.setSelected(true);
 			}
 		}
 		else if (e.getSource().equals(tglbtnManuel)) {
-			tglbtnAuto.setSelected(false);
-			tglbtnManuel.setSelected(true);
-			tglbtnWii.setSelected(false);
-			
-			if (uart != null) {
-				uart.write("Manual");
-				uart.write("Manual");
+			if (tglbtnAuto.isSelected() || tglbtnWii.isSelected()) {
+				tglbtnAuto.setSelected(false);
+				tglbtnManuel.setSelected(true);
+				tglbtnWii.setSelected(false);
+				
+				if (uart != null) {
+					uart.write("Manual");
+					uart.write("Manual");
+				}
+			}
+			else {
+				tglbtnManuel.setSelected(true);
 			}
 		}
 		else if (e.getSource().equals(tglbtnWii)) {
-			tglbtnAuto.setSelected(false);
-			tglbtnManuel.setSelected(false);
-			tglbtnWii.setSelected(true);
-			savedPoints.clear();
-			graph.repaint();
-			
-			if (uart != null) {
-				uart.write("Wii");
-				uart.write("Wii");
+			if (tglbtnAuto.isSelected() || tglbtnManuel.isSelected()) {
+				tglbtnAuto.setSelected(false);
+				tglbtnManuel.setSelected(false);
+				tglbtnWii.setSelected(true);
+				savedPoints.clear();
+				graph.repaint();
+				
+				if (uart != null) {
+					uart.write("Wii");
+					uart.write("Wii");
+				}
+			}
+			else {
+				tglbtnWii.setSelected(true);
 			}
 		}
 		else if (e.getSource().equals(btnStart)) {
 			if (uart != null) {
 				uart.write("Semi-auto");
 				uart.write("Semi-auto");
-				for (int i=0; i<savedPoints.size(); i++) {
-					uart.write(savedPoints.get(i)[0]+","+savedPoints.get(i)[1]+","+savedPoints.get(i)[2]);
+				
+				if (comboBox.getSelectedItem().equals("Perso")) {
+					for (int i=0; i<savedPoints.size(); i++) {
+						uart.write(savedPoints.get(i)[0]+","+savedPoints.get(i)[1]+","+savedPoints.get(i)[2]);
+					}
+				}
+				else {
+					uart.write((String) comboBox.getSelectedItem());
 				}
 				uart.write("Finish");
 			}
@@ -232,6 +274,13 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		else if (e.getSource().equals(btnReset)) {
 			savedPoints.clear();
 			graph.repaint();
+		}
+		// Combobox
+		else if (e.getSource().equals(comboBox)) {
+			if (!comboBox.getSelectedItem().equals("Perso")) {
+				savedPoints.clear();
+				graph.repaint();
+			}
 		}
 		// Menu
 		else if (e.getSource().equals(mntmConnection)) {

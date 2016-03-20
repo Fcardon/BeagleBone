@@ -140,10 +140,27 @@ class App():
 			if pointDatas == "Finish":
 				break
 			if pointDatas != "Semi-auto":
-				pointDatasTable = pointDatas.split(",")
-				horizontalPositionTable.append(int(pointDatasTable[0])*2)
-				verticalPositionTable.append(int(pointDatasTable[1])*2)
-				laserStateTable.append(pointDatasTable[2])
+				if pointDatas == "Square":
+					print "Dessine un carré"
+					self.shape.startShape(pointDatas, 1)
+					self.initServos()
+				elif pointDatas == "Diamond":
+					print "Dessine un losange"
+					self.shape.startShape(pointDatas, 1)
+					self.initServos()
+				elif pointDatas == "Circle":
+					print "Dessine un cercle"
+					self.shape.startShape(pointDatas, 1)
+					self.initServos()
+				elif pointDatas == "Infinite":
+					print "Dessine un infini"
+					self.shape.startShape(pointDatas, 1)
+					self.initServos()
+				else:
+					pointDatasTable = pointDatas.split(",")
+					horizontalPositionTable.append(int(pointDatasTable[0])*2)
+					verticalPositionTable.append(int(pointDatasTable[1])*2)
+					laserStateTable.append(pointDatasTable[2])
 
 		self.shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
 		self.laser.OFF()
