@@ -28,6 +28,7 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	@SuppressWarnings("unused")
 	private ConnectWindow connectWindow;
 	private SerialComm uart = null;
+	private String reading;
 	private String[] acquisition = new String[3];
 	
 	// Menu
@@ -184,25 +185,28 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		// Timer
 		if (e.getSource().equals(timer)) {
 			if (uart != null) {
-				acquisition = uart.read().split(",");
-				
-				try {
-					lblPosition.setText("Position: "+Integer.parseInt(acquisition[0])/2+","+Integer.parseInt(acquisition[1])/2);
-					
-					if (acquisition[2].equals("0")) {
-						lblLaser.setText("Laser: Eteint");
-						lblLaser.setForeground(Color.DARK_GRAY);
-						graph.setLaserActive(false);
+				reading = uart.read();
+				System.err.println(reading);
+				if (reading != null) {
+					acquisition = reading.split(",");
+					try {
+						lblPosition.setText("Position: "+Integer.parseInt(acquisition[0])/2+","+Integer.parseInt(acquisition[1])/2);
+						
+						if (acquisition[2].equals("0")) {
+							lblLaser.setText("Laser: Eteint");
+							lblLaser.setForeground(Color.DARK_GRAY);
+							graph.setLaserActive(false);
+						}
+						else {
+							lblLaser.setText("Laser: Allumé");
+							lblLaser.setForeground(Color.RED);
+							graph.setLaserActive(true);
+						}
+						graph.setPointPosition(Integer.parseInt(acquisition[0])/2, Integer.parseInt(acquisition[1])/2);
+						graph.repaint();
 					}
-					else {
-						lblLaser.setText("Laser: Allumé");
-						lblLaser.setForeground(Color.RED);
-						graph.setLaserActive(true);
-					}
-					graph.setPointPosition(Integer.parseInt(acquisition[0])/2, Integer.parseInt(acquisition[1])/2);
-					graph.repaint();
+					catch (NumberFormatException | ArrayIndexOutOfBoundsException exp) {}
 				}
-				catch (NumberFormatException | ArrayIndexOutOfBoundsException exp) {}
 			}
 		}
 		// Buttons

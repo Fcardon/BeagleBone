@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.PortInUseException;
@@ -18,6 +25,8 @@ public class SerialComm {
 	private OutputStream outputStream;
 	private InputStream inputStream;
 
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	
 	private String UARTName = "Inconnu";
 	private String datas;
 
@@ -58,6 +67,23 @@ public class SerialComm {
 	}
 
 	public String read() {
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final Future<String> handler = executor.submit(new Callable() {
+			@Override
+			public String call() throws Exception {
+				return readWithTimeout();
+			}
+		});
+		
+		try {
+			return handler.get(100, TimeUnit.MILLISECONDS);
+		} catch (TimeoutException | InterruptedException | ExecutionException e) {
+			handler.cancel(true);
+			return null;
+		}
+	}
+	
+	public String readWithTimeout() {
 		char data;
 		datas = "";
 
