@@ -186,7 +186,6 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		if (e.getSource().equals(timer)) {
 			if (uart != null) {
 				reading = uart.read();
-				System.err.println(reading);
 				if (reading != null) {
 					acquisition = reading.split(",");
 					try {

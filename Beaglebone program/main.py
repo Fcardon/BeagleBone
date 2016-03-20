@@ -47,7 +47,11 @@ class App():
 				elif self.mode == "Manual":
 					self.manualMode()
 				elif self.mode == "Wii":
-					self.wiiMode()
+					if self.nunchukIsConnected:
+						self.wiiMode()
+					else:
+						print "La manette \"Nunchuk\" n'est pas connectée"
+						self.mode = "Manual"
 				else:
 					sleep(2)
 					self.mode = "Auto"
@@ -91,7 +95,12 @@ class App():
 		self.uart = UART()
 
 		# Création du Nunchuk
-		self.nunchuk = Nunchuk()
+		try:
+			self.nunchuk = Nunchuk()
+			self.nunchukIsConnected = True
+		except IOError:
+			print "Erreur de connexion avec la manette \"Nunchuk\""
+			self.nunchukIsConnected = False
 	def initServos(self):
 		self.horizontalServo.setPosition(0)
 		self.verticalServo.setPosition(0)
@@ -162,10 +171,11 @@ class App():
 					verticalPositionTable.append(int(pointDatasTable[1])*2)
 					laserStateTable.append(pointDatasTable[2])
 
-		self.shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
+		if len(horizontalPositionTable) != 0:
+			print "Dessine une forme personnalisé"
+			self.shape.start(horizontalPositionTable, verticalPositionTable, laserStateTable)
 		self.laser.OFF()
 		self.mode = "Manual"
-		self.modeObj.setMode(self.mode)
 	def manualMode(self):
 		for i in range(100):
 			self.reading = self.uart.read()
