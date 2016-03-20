@@ -1,13 +1,16 @@
 #!/usr/bin/python
 #coding:utf-8
 
-import os
+import math
 from time import sleep
 import Methods
 
 # Carré
 squareHPositionTable = []
 squareVPositionTable = []
+# Losange
+diamondHPositionTable = []
+diamondVPositionTable = []
 # Cercle
 circleHPositionTable = []
 circleVPositionTable = []
@@ -24,6 +27,7 @@ class Shape():
 		self.uart = uart
 
 		self.initSquareShape()
+		self.initDiamondShape()
 		self.initCircleShape()
 		self.initInfiniteShape()
 
@@ -43,21 +47,25 @@ class Shape():
 		for value in range(-30,31):
 			squareHPositionTable.append(-30)
 			squareVPositionTable.append(value)
-	def initCircleShape(self):
+	def initDiamondShape(self):
 		for value in range(0,30):
-			circleHPositionTable.append(value)
+			diamondHPositionTable.append(value)
 
 		for value in range(-30,31):
-			circleHPositionTable.append(value*-1)
+			diamondHPositionTable.append(value*-1)
 
 		for value in range(-29,0):
-			circleHPositionTable.append(value)
+			diamondHPositionTable.append(value)
 
 		for value in range(-30,31):
-			circleVPositionTable.append(value*-1)
+			diamondVPositionTable.append(value*-1)
 
 		for value in range(-29,30):
-			circleVPositionTable.append(value)
+			diamondVPositionTable.append(value)
+	def initCircleShape(self):
+		for value in range(0,180):
+			circleHPositionTable.append(int(math.cos(math.radians(value*-2.0+90.0))*35.0))
+			circleVPositionTable.append(int(math.sin(math.radians(value*-2.0+90.0))*35.0))
 	def initInfiniteShape(self):
 		for value in range(-30,31):
 			infiniteHPositionTable.append(value)
@@ -85,11 +93,12 @@ class Shape():
 
 	# Démarre le dessin de la forme choisi
 	def startShape(self, shape, nb):
-		laserStateTable = ["1"]*len(squareHPositionTable)
-
 		if shape == "Square":
 			for i in range(0, nb):
-				self.start(squareHPositionTable, squareVPositionTable, laserStateTable)
+				self.start(squareHPositionTable, squareVPositionTable, ["1"]*len(squareHPositionTable))
+		elif shape == "Diamond":
+			for i in range(0, nb):
+				self.start(diamondHPositionTable, diamondVPositionTable, ["1"]*len(diamondHPositionTable))
 		elif shape == "Circle":
 			for i in range(0, nb):
 				self.start(circleHPositionTable, circleVPositionTable, ["1"]*len(circleHPositionTable))

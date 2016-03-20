@@ -21,16 +21,21 @@ class Mode():
 		self.mode = mode
 		if mode == "Manual" or mode == "Semi-auto":
 			print "Mode manuel"
+			self.shutdownThread.set()
 			Methods.writeFile("/sys/class/gpio/gpio"+str(self.led1)+"/value", "1", "w")
 			Methods.writeFile("/sys/class/gpio/gpio"+str(self.led2)+"/value", "0", "w")
 		elif mode == "Wii":
 			print "Mode Wii"
+			self.shutdownThread.set()
 			Methods.writeFile("/sys/class/gpio/gpio"+str(self.led1)+"/value", "1", "w")
 			Methods.writeFile("/sys/class/gpio/gpio"+str(self.led2)+"/value", "1", "w")
 		elif mode == "Auto":
 			print "Mode automatique"
+			self.shutdownThread.clear()
 			threading.Thread(target=self.blink).start()
 		elif mode == "Stop":
+			self.shutdownThread.set()
+			sleep(1)
 			Methods.writeFile("/sys/class/gpio/gpio"+str(self.led1)+"/value", "0", "w")
 			Methods.writeFile("/sys/class/gpio/gpio"+str(self.led2)+"/value", "0", "w")
 		else:
@@ -38,9 +43,6 @@ class Mode():
 
 	def getMode(self):
 		return self.mode
-
-	def stopThread(self):
-		self.shutdownThread.set()
 
 	def blink(self):
 		while not self.shutdownThread.is_set():

@@ -94,10 +94,17 @@ try:
 				if uart.inWaiting() != 0:
 					break
 				sleep(2)
+				print "Dessine un losange"
+				shape.startShape("Diamond", 3)
+				initServos()
+
+				if uart.inWaiting() != 0:
+					break
+				sleep(2)
 				print "Dessine un cercle"
 				shape.startShape("Circle", 3)
 				initServos()
-
+				
 				if uart.inWaiting() != 0:
 					break
 				sleep(2)
@@ -188,7 +195,6 @@ try:
 			modeObj.setMode(mode)
 except KeyboardInterrupt:
 	print "Arret du programme..."
-	modeObj.stopThread()
 	modeObj.setMode("Stop")
 	laser.OFF()
 	initServos()
