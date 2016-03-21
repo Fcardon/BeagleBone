@@ -88,8 +88,8 @@ class App():
 		self.modeObj = Mode(66, 69)
 
 		# Création des servos
-		self.horizontalServo = Servo("P9_14", "10", True)
-		self.verticalServo = Servo("P9_22", "11", True)
+		self.verticalServo = Servo("P9_14", "10", False)
+		self.horizontalServo = Servo("P9_22", "11", True)
 
 		# Création de l'UART
 		self.uart = UART()
