@@ -14,8 +14,13 @@ from UART import UART
 from Mode import Mode
 
 class App():
-
+	"""
+	Démarre une application qui permet de gérer la position sur deux axes d'un laser via des servomoteurs.
+	"""
 	def __init__(self):
+		"""
+		Méthode "main" de l'application.
+		"""
 		print "Initialisation des péripheriques..."
 		self.initPeriph()
 		print "Initialisation des servos..."
@@ -64,6 +69,9 @@ class App():
 			print "Programme arreté"
 
 	def initPeriph(self):
+		"""
+		Initialise tout les périphériques servant à l'application (Laser, Servos, Manette nunchuk...) et instancie les objets globals.
+		"""
 		try:
 			# GPIOs
 			Methods.writeFile("/sys/class/gpio/export", "66", "a")
@@ -102,11 +110,17 @@ class App():
 			print "Erreur de connexion avec la manette \"Nunchuk\""
 			self.nunchukIsConnected = False
 	def initServos(self):
+		"""
+		Initialise les servomoteurs à la position 0,0 et éteint le laser.
+		"""
 		self.horizontalServo.setPosition(0)
 		self.verticalServo.setPosition(0)
 		Methods.sendData(self.uart, 0, 0, self.laser.getState())
 
 	def autoMode(self):
+		"""
+		Gére le mode "Auto" de l'application. Le mode "Auto" réalise une succession de toutes les formes pré-enregistré en boucle.
+		"""
 		while 1:
 			self.laser.ON()
 			print "Dessine un carré"
@@ -139,6 +153,9 @@ class App():
 			sleep(2)
 			break
 	def semiAutoMode(self):
+		"""
+		Gére le mode "Semi-auto" de l'application. Le mode "Semi-auto" réalise les formes demandées via l'IHM.
+		"""
 		self.laser.OFF()
 		horizontalPositionTable = []
 		verticalPositionTable = []
@@ -177,6 +194,9 @@ class App():
 		self.laser.OFF()
 		self.mode = "Manual"
 	def manualMode(self):
+		"""
+		Gére le mode "Manuel" de l'application. Le mode "Manuel" réalise les mouvements simples via l'IHM (Déplacement vert le Haut, la droite, allumer le laser...).
+		"""
 		for i in range(100):
 			self.reading = self.uart.read()
 			hPos = self.horizontalServo.getPosition()
@@ -207,6 +227,9 @@ class App():
 			Methods.sendData(self.uart, self.horizontalServo.getPosition(), self.verticalServo.getPosition(), self.laser.getState())
 			sleep(0.01)
 	def wiiMode(self):
+		"""
+		Gére le mode "Wii" de l'application. Le mode "Wii" réalise les actions via la manette nunchuk.
+		"""
 		buttons = self.nunchuk.getButtons()
 		button_c = buttons[0]
 		button_z = buttons[1]

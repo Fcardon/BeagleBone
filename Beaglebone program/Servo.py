@@ -6,8 +6,19 @@ import Methods
 from time import sleep
 
 class Servo():
+	"""
+	Créait un objet "Servo" qui gére la position d'un servomoteur.
+	"""
 	# Initialisation des servos à 0 degré
 	def __init__(self, name, nb, invert):
+		"""
+		Initialise le PWM et positionne le servomoteur à 0 degrès.
+
+		Args:
+			name (str): Nom du PWM ("P9_14", "P9_22"...).
+			nb (str): Nombre après le nom du PWM.
+			invert (bool): Défini si l'axe du servomoteur est inversé.
+		"""
 		self.name = name
 		self.nb = nb
 		self.invert = invert
@@ -20,8 +31,13 @@ class Servo():
 		except IOError:
 			print "La configuration des servos a déjà été faites"
 
-	# Met à jour la position du servo selon la position donné en degrés
 	def setPosition(self, position):
+		"""
+		Met à jour la position du servo selon la position donné en degrés.
+
+		Args:
+			position (int): Position en degré
+		"""
 		if position > 90:
 			position = 90
 		elif position < -90:
@@ -37,10 +53,26 @@ class Servo():
 
 	# Getters and Setters
 	def getName(self):
+		"""
+		Returns:
+			str -- Nom du PWM utilisé
+		"""
 		return self.name
 	def getNb(self):
+		"""
+		Returns:
+			str -- Nombre associé au nom du PWM utilisé
+		"""
 		return self.nb
 	def isInvert(self):
+		"""
+		Returns:
+			str -- Vrai si l'axe est inversé
+		"""
 		return self.invert
 	def getPosition(self):
+		"""
+		Returns:
+			str -- Position du servomoteur
+		"""
 		return self.position
