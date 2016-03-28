@@ -2,6 +2,17 @@ Mini-projet BeagleBone
 ===
 Le projet a pour but de piloter un pointeur laser avec deux servomoteurs grâce à une BeagleBone. La BeagleBone devra fonctionner avec un noyau Linux personnalisé généré avec Yocto.
 
+#Sommaire
+- [Carte Utilisée](https://github.com/Fcardon/BeagleBone#carte-utilis%C3%A9e)
+- [Noyau Linux personnalisé](https://github.com/Fcardon/BeagleBone#noyau-linux-personnalis%C3%A9)
+- [Interface Homme-Machine](https://github.com/Fcardon/BeagleBone#interface-homme-machine)
+	- [Présentation de l'IHM](https://github.com/Fcardon/BeagleBone#pr%C3%A9sentation-de-lihm)
+	- [Dépendances](https://github.com/Fcardon/BeagleBone#d%C3%A9pendances)
+	- [Fonctionnement](https://github.com/Fcardon/BeagleBone#fonctionnement)
+		- [Mode "Auto"](https://github.com/Fcardon/BeagleBone#mode-auto)
+		- [Mode "Manuel"](https://github.com/Fcardon/BeagleBone#mode-manuel)
+		- [Mode "Wii"](https://github.com/Fcardon/BeagleBone#mode-wii)
+
 # Carte Utilisée
 La carte utilisée pour le projet est une BeagleBone white. Elle possède un cortex A8. Pour plus d'informations sur cette carte RDV ici: [BeagleBone white](http://beagleboard.org/bone-original).
 
