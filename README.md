@@ -36,6 +36,7 @@ Une fois connecté, l'IHM va attendre de recevoir des données de la part de la 
 
 ### Mode "Auto"
 Ce mode éxecute des formes en boucle pré-programmées dans la BeagleBone.
+
 Formes réalisées dans l'ordre:
 - Carré (2 fois)
 - Losange (3 fois)
@@ -44,6 +45,7 @@ Formes réalisées dans l'ordre:
 
 ### Mode "Manuel"
 Ce mode permet de piloter le pointeur laser avec son clavier.
+
 Touches de commandes:
 - 8: Haut
 - 2: Bas
